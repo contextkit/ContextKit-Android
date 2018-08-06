@@ -1,0 +1,134 @@
+<!--
+  ~   Copyright (c) 2017. Mattia Campana, mattia.campana@iit.cnr.it, Franca Delmastro, franca.delmastro@gmail.com
+  ~
+  ~   This file is part of ContextKit.
+  ~
+  ~   ContextKit (CK) is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
+  ~
+  ~   ContextKit (CK) is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU General Public License for more details.
+  ~
+  ~   You should have received a copy of the GNU General Public License
+  ~   along with ContextKit (CK).  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="app_name">ASKDemo</string>
+    <string name="ck_conf">
+        {
+            "logPath" : "askdemo",
+            "probes" : [
+                {
+                    "name" : "MultimediaProbe",
+                    "logFile": "multimedia.csv"
+                },
+                {
+                    "name" : "WeatherProbe",
+                    "interval" : 3600,
+                    "unit" : 2,
+                    "appId" : "84da1f0489af48796227b87443170b50",
+                    "logFile" : "weather.csv"
+                },
+                {
+                    "name" : "ActivityRecognitionProbe",
+                    "updateInterval" : 60,
+                    "logFile" : "activity.csv"
+                },
+                {
+                    "name" : "AudioProbe",
+                    "interval" : 60,
+                    "logFile" : "audio.csv"
+                },
+                {
+                    "name" : "BatteryProbe",
+                    "interval" : 60,
+                    "logFile" : "battery.csv"
+                },
+                {
+                    "name" : "BluetoothConnProbe",
+                    "logFile" : "bt_conn.csv"
+                },
+                {
+                    "name" : "BluetoothScanProbe",
+                    "interval" : 60,
+                    "logFile" : "bt_scan.csv"
+                },
+                {
+                    "name" : "CallsProbe",
+                    "logFile" : "calls.csv"
+                },
+                {
+                    "name" : "CellInfoProbe",
+                    "interval" : 60,
+                    "logFile" : "cells.csv"
+                },
+                {
+                    "name" : "CurrentCalendarEventsProbe",
+                    "interval" : 60,
+                    "logFile" : "calendar_current_events.csv"
+                },
+                {
+                    "name" : "DisplayProbe",
+                    "interval" : 60,
+                    "logFile" : "display.csv"
+                },
+                {
+                    "name" : "EnvironmentSensorProbe",
+                    "interval" : 60,
+                    "logFile" : "environment_sensors.csv"
+                },
+                {
+                    "name" : "MotionSensorsProbe",
+                    "interval" : 60,
+                    "logFile" : "motion_sensors.csv"
+                },
+                {
+                    "name" : "PositionSensorProbe",
+                    "interval" : 60,
+                    "logFile" : "position_sensors.csv"
+                },
+                {
+                    "name" : "InstalledAppsProbe",
+                    "interval" : 60,
+                    "logFile" : "installed_apps.csv"
+                },
+                {
+                    "name" : "LocationProbe",
+                    "interval" : 180,
+                    "logFile" : "location.csv"
+                },
+                {
+                    "name" : "RunningApplicationsProbe",
+                    "interval" : 180,
+                    "logFile" : "running_apps.csv"
+                },
+                {
+                    "name" : "AppsUsageProbe",
+                    "interval" : 180,
+                    "logFile" : "apps_usage.csv"
+                },
+                {
+                    "name" : "WiFiProbe",
+                    "interval" : 180,
+                    "logFile" : "wifi_scans.csv"
+                },
+                {
+                    "name" : "WiFiP2PProbe",
+                    "interval" : 120,
+                    "startDelay" : 120,
+                    "logFile" : "wifi_p2p_scans.csv"
+                },
+                {
+                    "name" : "SmsProbe",
+                    "logFile" : "sms.csv"
+                }
+            ]
+        }
+    </string>
+    <string name="service_label">SKNotificationListener</string>
+</resources>

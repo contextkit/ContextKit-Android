@@ -1,0 +1,60 @@
+apply plugin: 'com.android.library'
+
+ext {
+    PUBLISH_GROUP_ID = 'it.matbell'
+    PUBLISH_ARTIFACT_ID = 'ask'
+<<<<<<< HEAD
+    PUBLISH_VERSION = '0.6.2'
+=======
+    PUBLISH_VERSION = '0.6.3'
+>>>>>>> 4d5ffc73ae83cf72f700ebe170bb06238d16486a
+}
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 20
+        targetSdkVersion 27
+        versionCode 6
+<<<<<<< HEAD
+        versionName "0.6.2"
+=======
+        versionName "0.6.3"
+>>>>>>> 4d5ffc73ae83cf72f700ebe170bb06238d16486a
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.google.android.gms:play-services-location:11.8.0'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    //https://github.com/EverythingMe/easy-content-providers
+    implementation 'me.everything:providers-android:1.0.1'
+
+    implementation 'com.android.volley:volley:1.1.0'
+
+    apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+}
