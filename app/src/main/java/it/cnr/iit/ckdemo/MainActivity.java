@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startASK(){
-        ask = new CK(this, getResources().getString(R.string.ask_conf));
+        ask = new CK(this, getResources().getString(R.string.ck_conf));
         ask.start();
     }
 
