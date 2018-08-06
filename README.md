@@ -1,35 +1,35 @@
-# Android Sensing Kit
+# Context Kit
 
 [ ![Download](https://api.bintray.com/packages/matbell/ASK/ASK/images/download.svg) ](https://bintray.com/matbell/ASK/ASK/_latestVersion)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 ![alt text](https://user-images.githubusercontent.com/1859476/34232195-14e95404-e594-11e7-8cc8-6361b50433d5.png)
 
-**A**ndroid **S**ensing **K**it (**ASK**) is a development framework
+**C**ontext**K**it (**CK**) is a development framework
 written in Java, designed for large-scale sensing experiments with
 Android devices.
 It supports multiple sensors such as Location, Motion, and Proximity
 (using both Bluetooth and Wi-Fi Direct).
-ASK provides also some functionalities that can be used to characterize
+CK provides also some functionalities that can be used to characterize
 the users' behaviour and interests, such as the apps usage statistics,
 activity recognition, calls and messaging logs.
 
-Due to its modular design, a developer can easily extend ASK
+Due to its modular design, a developer can easily extend CK
 implementing his/her own functionalities or reusing part of the
 built-in features offered by the framework.
-In addition, ASK provides a useful set of features to automatically
+In addition, CK provides a useful set of features to automatically
 store and uploads the sensed information to remote servers, simplifying
 the data collection during the experiments.
 
 This framework is freely inspired by similar works (e.g.,
 [Funf Open Sensing Framework](http://funf.org), or
 [SensingKit](https://sensingkit.org)) but, differently from
-them, ASK supports both the features and building process of the most
+them, CK supports both the features and building process of the most
 recent versions of the Android operating system.
 
 ## Built-in probes
 
-ASK provides a set of built-in probes to gather rich data about the
+CK provides a set of built-in probes to gather rich data about the
 users' activities, behaviour, and social relationships. The currently
 implemented built-in probes are able to acquire the following
 data:
@@ -50,18 +50,30 @@ data:
 
 ## Install
 
-To install ASK, add the following dependency to your `.gradle` file.
+To install CK, add the following dependency to your `.gradle` files.
 
+Add `jitpack.io` as repository
+```
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+ ```
+ 
+and then, add the dependency:
 ```
 dependencies {
-    implementation 'it.matbell:ask:0.5'
+    implementation 'com.github.contextkit:ContextKit-Android:1.0.1'
 }
 ```
+
 ## Using the library
 
 ### Configuration
 
-ASK configuration is in the JSON format. For example, the following
+CK configuration is in the JSON format. For example, the following
 configuration requires to monitor two different things: the user's
 activity (`ActivityRecognitionProbe`), and the battery status
 (`BatteryProbe`). The first probe is executed every 5 minutes and data
@@ -86,45 +98,44 @@ in another file, called `battery.csv`.
 }
 ```
 
-### Start ASK
+### Start CK
 
-Starting ASK is very simple. The following lines load the configuration
+Starting CK is very simple. The following lines load the configuration
 and start the background service which executes the required probes
 until it is stopped.
 
 ```java
-ASK ask = new ASK(this, getResources().getString(R.string.ask_conf));
-ask.start();
+CK ck = new CK(this, getResources().getString(R.string.ck_conf));
+ck.start();
 ```
 
-### Stop ASK
+### Stop CK
 
 To stop the probes execution, use the following code:
 
 ```java
-ask.stop();
+ck.stop();
 ```
 
 ## License
 
 ```
-Copyright (c) 2017. Mattia Campana, m.campana@iit.cnr.it,
-campana.mattia@gmail.com
+Copyright (c) 2017. Mattia Campana, m.campana@iit.cnr.it, Franca Delmastro, franca.delmastro@iit.cnr.it
 
-This file is part of Android Sensing Kit (ASK).
+This file is part of Context Kit (CK).
 
-Android Sensing Kit (ASK) is free software: you can redistribute it
+Context Kit (CK) is free software: you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
 
-Android Sensing Kit (ASK) is distributed in the hope that it will be
+Context Kit (CK) is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Android Sensing Kit (ASK).  If not, see
+along with Context Kit (CK).  If not, see
 <http://www.gnu.org/licenses/>.`
 ```
 
