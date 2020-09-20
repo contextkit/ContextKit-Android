@@ -19,23 +19,22 @@
 
 package it.cnr.iit.ck.logs;
 
-import android.os.Environment;
+import android.content.Context;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 
-import it.cnr.iit.ck.commons.Utils;
-import it.cnr.iit.ck.model.Loggable;
+import it.cnr.iit.ck.sensing.model.Loggable;
+import it.cnr.iit.ck.sensing.model.SensorData;
 
 public class FileLogger {
-
-    private static final String DEFAULT_BASE_DIR = "AndroidSensingKit";
-    public static final String SEP = "\t";
+    public static final String SEP = ",";
 
     private static FileLogger instance;
     String basePath;
@@ -46,105 +45,50 @@ public class FileLogger {
         return instance;
     }
 
-    public void setBaseDir(String baseDir){
-
-        if(baseDir == null) baseDir = DEFAULT_BASE_DIR;
-
-        basePath = Environment.getExternalStorageDirectory() + File.separator + baseDir;
+    public void setBaseDir(Context applicationContext){
+        basePath = ContextCompat.getExternalFilesDirs(applicationContext, null)[0].getPath();
         File dir = new File(basePath);
         if(!dir.exists()) dir.mkdir();
+        Log.d("CK", "Base log path: " + basePath);
     }
 
-    public void store(final String fileName, final Collection<? extends Loggable> data,
-                      final boolean withTimeStamp){
+    public void store(final String fileName, final Loggable... dataList){
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        new Thread(() -> {
 
-                File file = new File(basePath + File.separator + fileName);
+            File file = createLogFile(fileName, dataList[0].getLogHeader());
 
-                if(!file.exists()){
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            Date currentTime = Calendar.getInstance().getTime();
 
-                try {
-
-                    FileWriter fw = new FileWriter(file, true);
-
-                    Date currentTime = Calendar.getInstance().getTime();
-
-                    for(Loggable printable : data){
-
-
-                        String toWrite;
-
-                        if(withTimeStamp){
-
-                            toWrite = currentTime.getTime() + SEP + printable.getDataToLog();
-
-                        } else{
-                            toWrite = printable.getDataToLog();
-                        }
-
-                        fw.write(toWrite+"\n");
-
-                    }
-
-                    fw.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+            for(Loggable data : dataList) {
+                String toWrite = currentTime + SEP + data.getDataToLog();
+                writeToFile(file, toWrite);
             }
-        }).start();
 
+        }).start();
     }
 
-    public void store(final String fileName, final Loggable data, final boolean withTimeStamp){
+    private File createLogFile(String fileName, String header){
+        File file = new File(basePath + File.separator + fileName);
+        header = "date_time,"+header;
+        try {
+            if(!file.exists() && file.createNewFile()) writeToFile(file, header);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        return file;
+    }
 
-                File file = new File(basePath + File.separator + fileName);
+    private void writeToFile(File file, String stringData){
 
-                if(!file.exists()){
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+        try {
+            FileWriter fw = new FileWriter(file, true);
+            fw.write(stringData+"\n");
+            fw.close();
 
-                try {
-                    FileWriter fw = new FileWriter(file, true);
-
-                    String toWrite;
-
-                    if(withTimeStamp){
-
-                        Date currentTime = Calendar.getInstance().getTime();
-                        toWrite = currentTime.getTime() + SEP + data.getDataToLog();
-
-                    } else{
-                        toWrite = data.getDataToLog();
-                    }
-
-                    fw.write(toWrite+"\n");
-                    fw.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }).start();
-
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -25,20 +25,14 @@ import android.util.Log;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import it.cnr.iit.ck.controllers.PreferencesController;
+import it.cnr.iit.ck.sensing.controllers.PreferencesController;
 
 class Zipper {
     private static final int BUFFER = 1024;

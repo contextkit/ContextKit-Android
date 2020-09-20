@@ -19,7 +19,7 @@
 
 package it.cnr.iit.ck.workers;
 
-import it.cnr.iit.ck.probes.BaseProbe;
+import it.cnr.iit.ck.sensing.probes.BaseProbe;
 
 public abstract class Worker{
 

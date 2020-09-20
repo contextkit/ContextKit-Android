@@ -31,41 +31,49 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import it.cnr.iit.ck.commons.Utils;
-import it.cnr.iit.ck.probes.BaseProbe;
-import it.cnr.iit.ck.probes.ContinuousProbe;
+import it.cnr.iit.ck.features.FeaturesExtractor;
+import it.cnr.iit.ck.sensing.probes.BaseProbe;
+import it.cnr.iit.ck.sensing.probes.ContinuousProbe;
 
 /**
  * This class parses and represents the list of probes requested by the user through the
  * configuration. The configuration should be specified using the Json format.
  *
  */
-class CKSetup {
+public class CKSetup implements Serializable {
 
-    // Expected fields in the Json configuration
-    private static final String JSON_PROBES = "probes";
-    private static final String JSON_PROBE_NAME = "name";
-    private static final String JSON_PROBE_INTERVAL = "interval";
-    private static final String JSON_PROBE_START_DELAY = "startDelay";
-    private static final String JSON_PROBE_LOG_FILE = "logFile";
+    // Sensing section
+    private static final String SECTION_SENSING = "sensors";
+    private static final String FIELD_PROBE = "probe";
+    private static final String FIELD_INTERVAL = "interval";
+    private static final String FIELD_START_DELAY = "startDelay";
+    private static final String FIELD_LOG_FILE = "logFile";
 
-    private static final String JSON_LOGGER_PATH = "logPath";
-    private static final String JSON_REMOTE_LOGGER = "remoteLoggerDest";
-    private static final String JSON_ZIPPER_INTERVAL = "zipperInterval";
-    private static final String JSON_MAX_LOG_SIZE = "maxLogSizeMb";
+    // Remote Endpoint section
+    private static final String SECTION_REMOTE_ENDPOINT = "remoteEndpoint";
+    private static final String FIELD_REMOTE_URL = "url";
+    private static final String FIELD_MAX_LOG_SIZE = "maxLogSizeMb";
+
+    // Features section
+    private static final String SECTION_FEATURES = "features";
+    private static final String FIELD_SOURCES = "sources";
 
     // Name of the package that contains probes
-    private static final String PROBES_PKG = "it.matbell.ask.probes";
+    private static final String PROBES_PKG = "it.cnr.iit.ck.sensing.probes";
 
-    public List<BaseProbe> probes = new ArrayList<>();
-    String loggerPath;
+    public HashMap<String, BaseProbe> probes = new HashMap<>();
     String remoteLogger;
     Integer maxLogSizeMb;
     Integer zipperInterval;
+
+    FeaturesExtractor featuresExtractor;
 
     private CKSetup(){}
 
@@ -78,46 +86,104 @@ class CKSetup {
      * @return              The SKSetup object containing the Probe objects specified in the Json
      *                      configuration
      */
-    static CKSetup parse(Context context, String jsonConf){
+    static CKSetup fromJson(Context context, String jsonConf){
 
-        CKSetup skSetup = new CKSetup();
+        CKSetup ckSetup = new CKSetup();
 
         try {
-
             JSONObject conf = new JSONObject(jsonConf);
 
-            JSONArray jsonProbes = conf.getJSONArray(JSON_PROBES);
+            if(conf.has(SECTION_SENSING))
+                getSensorsSettings(ckSetup, context, conf.getJSONArray(SECTION_SENSING));
 
-            for(int i = 0; i < jsonProbes.length(); i++){
+            if(conf.has(SECTION_REMOTE_ENDPOINT))
+                getRemoteEndpointSettings(ckSetup, conf.getJSONObject(SECTION_REMOTE_ENDPOINT));
 
-                BaseProbe probe = getProbeFromClass(jsonProbes.getJSONObject(i).toString());
-
-                if(probe != null){
-                    probe.setContext(context);
-                    skSetup.probes.add(probe);
-                }
-            }
-
-            if(conf.has(JSON_LOGGER_PATH))
-                skSetup.loggerPath = conf.getString(JSON_LOGGER_PATH).replace(
-                        "\"","");
-
-            if(conf.has(JSON_REMOTE_LOGGER))
-                skSetup.remoteLogger = conf.getString(JSON_REMOTE_LOGGER).replace(
-                        "\"","");
-
-            if(conf.has(JSON_ZIPPER_INTERVAL))
-                skSetup.zipperInterval = conf.getInt(JSON_ZIPPER_INTERVAL);
-
-            if(conf.has(JSON_MAX_LOG_SIZE))
-                skSetup.maxLogSizeMb = conf.getInt(JSON_MAX_LOG_SIZE);
+            if(conf.has(SECTION_FEATURES))
+                getFeaturesSettings(ckSetup, conf.getJSONObject(SECTION_FEATURES));
 
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return ckSetup;
+    }
 
-        return skSetup;
+    /**
+     * Create sensing Probes from the Json configuration.
+     *
+     * @param setup         Instance of CKSetup to update
+     * @param context       Application context
+     * @param jsonProbes    JSONArray representing the list of Probes to activate
+     */
+    private static void getSensorsSettings(CKSetup setup, Context context, JSONArray jsonProbes){
+
+        try{
+            for(int i = 0; i < jsonProbes.length(); i++){
+                String probeConf = jsonProbes.getJSONObject(i).toString();
+                String probeName = jsonProbes.getJSONObject(i).getString(FIELD_PROBE);
+                BaseProbe probe = getProbeFromClass(probeConf, context);
+                if(probe != null) setup.probes.put(probeName, probe);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Remote Endpoint configurations.
+     *
+     * @param setup         Instance of CKSetup to update
+     * @param conf          JSONObject that represents the configuration
+     */
+    private static void getRemoteEndpointSettings(CKSetup setup, JSONObject conf){
+        try {
+
+            if(conf.has(FIELD_REMOTE_URL))
+                setup.remoteLogger = conf.getString(FIELD_REMOTE_URL).replace(
+                        "\"","");
+
+            if(conf.has(FIELD_INTERVAL))
+                setup.zipperInterval = conf.getInt(FIELD_INTERVAL);
+
+            if(conf.has(FIELD_MAX_LOG_SIZE))
+                setup.maxLogSizeMb = conf.getInt(FIELD_MAX_LOG_SIZE);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Features configurations.
+     *
+     * @param setup         Instance of CKSetup to update
+     * @param conf          JSONObject that represents the configuration
+     */
+    private static void getFeaturesSettings(CKSetup setup, JSONObject conf){
+
+        try {
+            List<BaseProbe> sources = new ArrayList<>();
+
+            for(int i=0; i<conf.getJSONArray(FIELD_SOURCES).length(); i++) {
+                String sourceName = conf.getJSONArray(FIELD_SOURCES).getString(i);
+                sources.add(setup.probes.get(sourceName));
+            }
+
+            FeaturesExtractor featuresExtractor = new FeaturesExtractor(sources);
+            featuresExtractor.setInterval(conf.getInt(FIELD_INTERVAL));
+
+            if(conf.has(FIELD_START_DELAY))
+                featuresExtractor.setStartDelay(conf.getInt(FIELD_START_DELAY));
+
+            if(conf.has(FIELD_LOG_FILE))
+                featuresExtractor.setLogFile(conf.getString(FIELD_LOG_FILE));
+
+            setup.featuresExtractor = featuresExtractor;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -127,7 +193,7 @@ class CKSetup {
      *
      * @return                  The Probe object
      */
-    private static BaseProbe getProbeFromClass(String jsonObject){
+    private static BaseProbe getProbeFromClass(String jsonObject, Context context){
 
         GsonBuilder builder = new GsonBuilder();
         // Needed for the the Gson library bug -----------------------------------------------------
@@ -140,7 +206,7 @@ class CKSetup {
         Gson gson = builder.create();
 
         JsonObject jsonProbe = new JsonParser().parse(jsonObject).getAsJsonObject();
-        String className = jsonProbe.get(JSON_PROBE_NAME).getAsString();
+        String className = jsonProbe.get(FIELD_PROBE).getAsString();
 
         BaseProbe probe = null;
 
@@ -148,9 +214,10 @@ class CKSetup {
 
             Class<?> clazz = Class.forName(PROBES_PKG+"."+className);
             probe = (BaseProbe) gson.fromJson(jsonProbe, clazz);
-
-            probe = parseRequiredFields(probe, jsonProbe.getAsJsonObject(), className);
-            probe = parseOptionalFields(probe, jsonProbe.getAsJsonObject());
+            probe.setContext(context);
+            parseRequiredFields(probe, jsonProbe.getAsJsonObject(), className);
+            parseOptionalFields(probe, jsonProbe.getAsJsonObject());
+            probe.parseConfiguration(jsonProbe.getAsJsonObject());
 
         }catch (ClassNotFoundException e){
             Log.e(Utils.TAG, "Probe "+className+" not found.");
@@ -172,22 +239,19 @@ class CKSetup {
      *
      * @return              the probe object with the optional parameters (if present)
      */
-    private static BaseProbe parseRequiredFields(BaseProbe probe,
-                                                 JsonObject jsonObject, String className){
+    private static void parseRequiredFields(BaseProbe probe, JsonObject jsonObject, String className){
 
         if(probe instanceof ContinuousProbe){
 
-            if(!jsonObject.has(JSON_PROBE_INTERVAL)){
-                Log.e(Utils.TAG, "Missing field "+JSON_PROBE_INTERVAL+" for "+className);
+            if(!jsonObject.has(FIELD_INTERVAL)){
+                Log.e(Utils.TAG, "Missing field "+ FIELD_INTERVAL +" for "+className);
                 probe = null;
 
             }else{
                 ((ContinuousProbe)probe).setInterval(jsonObject.get(
-                        JSON_PROBE_INTERVAL).getAsInt());
+                        FIELD_INTERVAL).getAsInt());
             }
         }
-
-        return probe;
     }
 
     /**
@@ -199,14 +263,12 @@ class CKSetup {
      *
      * @return              the probe object with the optional parameters (if present)
      */
-    private static BaseProbe parseOptionalFields(BaseProbe probe, JsonObject jsonObject){
+    private static void parseOptionalFields(BaseProbe probe, JsonObject jsonObject){
 
-        if(jsonObject.has(JSON_PROBE_LOG_FILE))
-            probe.setLogFile(jsonObject.get(JSON_PROBE_LOG_FILE).getAsString());
+        if(jsonObject.has(FIELD_LOG_FILE))
+            probe.setLogFile(jsonObject.get(FIELD_LOG_FILE).getAsString());
 
-        if(jsonObject.has(JSON_PROBE_START_DELAY))
-            probe.setStartDelay(jsonObject.get(JSON_PROBE_START_DELAY).getAsInt());
-
-        return probe;
+        if(jsonObject.has(FIELD_START_DELAY))
+            probe.setStartDelay(jsonObject.get(FIELD_START_DELAY).getAsInt());
     }
 }

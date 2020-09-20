@@ -20,17 +20,26 @@
 package it.cnr.iit.ckdemo;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.AppOpsManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import it.cnr.iit.ck.CK;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import it.cnr.iit.ck.CKConfiguration;
+import it.cnr.iit.ck.ContextKit;
 import it.cnr.iit.ck.CKManager;
 
 /**
@@ -57,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.READ_CALENDAR
     };
-    private CK ask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,37 +76,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        checkPermissions();
-
-        if(CKManager.RUNNING) ((Button)findViewById(R.id.button2)).setText("STOP READING");
-        else ((Button)findViewById(R.id.button2)).setText("START NEW READING");
     }
 
-    private void startASK(){
-        ask = new CK(this, getResources().getString(R.string.ck_conf));
-        ask.start();
+    public void onSensingClicked(View view){
+        startActivity(new Intent(this, SensingActivity.class));
     }
 
-    private void stopASK(){
-
-        if(ask != null) ask.stop();
+    public void onCrClicked(View view){
+        startActivity(new Intent(this, CRActivityDemo.class));
     }
 
-    public void onControlClicked(View view){
-
-        if(!CKManager.RUNNING){
-            startASK();
-            ((Button)view).setText("STOP READING");
-
-        }else{
-            stopASK();
-            ((Button)view).setText("START NEW READING");
-        }
-    }
-
-    private void checkPermissions(){
-
+    public void onPermissionClicked(View view){
         boolean require = false;
 
         for(String permission : RUNTIME_PERMISSIONS){
@@ -111,6 +99,14 @@ public class MainActivity extends AppCompatActivity {
 
         if(require)
             ActivityCompat.requestPermissions(this, RUNTIME_PERMISSIONS, REQ_CODE);
+        else{
+            startPackageUsageActivity();
+        }
+    }
+
+    private void startPackageUsageActivity(){
+        if(!hasPermission())
+            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 1);
     }
 
     private boolean allPermissionsGranted(int[] granted){
@@ -121,22 +117,31 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private boolean hasPermission() {
+        try {
+            PackageManager packageManager = getApplicationContext().getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getApplicationContext().getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            return (mode == AppOpsManager.MODE_ALLOWED);
+
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
         switch (requestCode) {
             case 0: {
-
-                if (allPermissionsGranted(grantResults)) {
-                    Log.d(MainActivity.class.getName(), "Permissions granted");
-
-                } else {
-
-                    Log.d(MainActivity.class.getName(), "Doh! Missing some permission.");
-                }
-
+                if (allPermissionsGranted(grantResults)) startPackageUsageActivity();
             }
+
+            case 1:
+                Log.d(MainActivity.class.getName(), "Permissions granted");
         }
     }
 }

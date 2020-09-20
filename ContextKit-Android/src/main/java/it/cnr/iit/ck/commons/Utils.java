@@ -19,45 +19,7 @@
 
 package it.cnr.iit.ck.commons;
 
-import android.net.wifi.WifiManager;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Utils {
 
     public static final String TAG = "CK";
-
-    public static WifiManager.WifiLock acquireWifiLock(WifiManager wifiManager,
-                                                        WifiManager.WifiLock wifiLock,
-                                                        String lockKey) {
-
-        wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, lockKey);
-        wifiLock.setReferenceCounted(false);
-        wifiLock.acquire();
-
-        return wifiLock;
-    }
-
-    public static WifiManager.WifiLock releaseWifiLock(WifiManager.WifiLock wifiLock) {
-
-        if (wifiLock != null) {
-            if (wifiLock.isHeld()) {
-                wifiLock.release();
-            }
-            wifiLock = null;
-        }
-
-        return wifiLock;
-    }
-
-    public static String formatLogOutput(Object...data){
-
-        List<String> list = new ArrayList<>();
-        for(Object o : data) list.add(String.valueOf(o));
-
-        return StringUtils.join(list, ",");
-    }
 }

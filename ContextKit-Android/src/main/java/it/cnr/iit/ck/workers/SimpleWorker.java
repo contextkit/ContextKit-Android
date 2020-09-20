@@ -21,7 +21,7 @@ package it.cnr.iit.ck.workers;
 
 import android.os.Handler;
 
-import it.cnr.iit.ck.probes.BaseProbe;
+import it.cnr.iit.ck.sensing.probes.BaseProbe;
 
 public class SimpleWorker extends Worker {
 
@@ -32,13 +32,10 @@ public class SimpleWorker extends Worker {
     @Override
     public void start() {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        new Handler().postDelayed(() -> {
 
-                if(isFirstRun()) getProbe().onFirstRun();
+            if(isFirstRun()) getProbe().onFirstRun();
 
-            }
         }, getProbe().getStartDelay()*1000);
 
     }

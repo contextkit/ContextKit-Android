@@ -18,11 +18,23 @@
   ~   along with ContextKit (CK).  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:keepScreenOn="true">
+
+    <Button
+        android:id="@+id/perm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="GRANT PERMISSIONS"
+        android:onClick="onPermissionClicked"/>
 
     <Button
         android:id="@+id/button2"
@@ -33,9 +45,16 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="START NEW READING"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:onClick="onControlClicked"/>
-</android.support.constraint.ConstraintLayout>
+        android:onClick="onSensingClicked"/>
+
+    <Button
+        android:id="@+id/cr_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Context Recognition"
+        android:onClick="onCrClicked"/>
+</LinearLayout>

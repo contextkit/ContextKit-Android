@@ -22,7 +22,7 @@ package it.cnr.iit.ck.workers;
 import android.util.Log;
 
 import it.cnr.iit.ck.commons.Utils;
-import it.cnr.iit.ck.probes.ContinuousProbe;
+import it.cnr.iit.ck.sensing.probes.ContinuousProbe;
 
 public class ThreadWorker extends Worker {
 
